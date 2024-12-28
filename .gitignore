@@ -1,0 +1,16 @@
+# Python
+*.pyc
+*.pyo
+__pycache__/
+*.env
+
+# Streamlit
+.streamlit/
+
+# ChromaDB
+chroma_data/
+
+# Общие
+.DS_Store
+.idea/
+.vscode/
