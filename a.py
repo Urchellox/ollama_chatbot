@@ -42,7 +42,6 @@ def stream_chat(model, messages):
         raise e
 
 def store_in_chroma(role, content):
-    """Сохраняет сообщения в ChromaDB."""
     chat_collection.add(
         documents=[content],
         metadatas=[{"role": role}],
@@ -50,7 +49,6 @@ def store_in_chroma(role, content):
     )
 
 def retrieve_from_chroma():
-    """Извлекает все сообщения из ChromaDB."""
     try:
         results = chat_collection.get()
         return results["documents"], results["metadatas"]
