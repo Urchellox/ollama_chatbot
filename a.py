@@ -42,6 +42,7 @@ def stream_chat(model, messages):
         raise e
 
 def store_in_chroma(role, content):
+    """Сохраняет сообщения в ChromaDB."""
     chat_collection.add(
         documents=[content],
         metadatas=[{"role": role}],
@@ -49,6 +50,7 @@ def store_in_chroma(role, content):
     )
 
 def retrieve_from_chroma():
+    """Извлекает все сообщения из ChromaDB."""
     try:
         results = chat_collection.get()
         return results["documents"], results["metadatas"]
@@ -62,6 +64,13 @@ def main():
 
     model = st.sidebar.selectbox("Выберите модель", ["llama3.2:latest", "llama3.1 8b", "phi3", "mistral"])
     logging.info(f"Выбрана модель: {model}")
+
+    uploaded_file = st.sidebar.file_uploader("Загрузите текстовый файл", type="txt")
+    if uploaded_file is not None:
+        file_content = uploaded_file.read().decode("utf-8")
+        st.session_state.messages.append({"role": "system", "content": file_content})
+        store_in_chroma("system", file_content)
+        st.sidebar.success("Файл успешно загружен и добавлен в контекст.")
 
     if prompt := st.chat_input("Ваш вопрос"):
         st.session_state.messages.append({"role": "user", "content": prompt})
