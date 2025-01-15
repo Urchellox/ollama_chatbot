@@ -42,7 +42,6 @@ def stream_chat(model, messages):
         raise e
 
 def store_in_chroma(role, content):
-    """Сохраняет сообщения в ChromaDB."""
     chat_collection.add(
         documents=[content],
         metadatas=[{"role": role}],
@@ -50,7 +49,6 @@ def store_in_chroma(role, content):
     )
 
 def retrieve_from_chroma():
-    """Извлекает все сообщения из ChromaDB."""
     try:
         results = chat_collection.get()
         return results["documents"], results["metadatas"]
@@ -58,9 +56,21 @@ def retrieve_from_chroma():
         logging.error(f"Ошибка при извлечении данных: {e}")
         return [], []
 
+def load_constitution(file_path="constitution_kz.txt"):
+    try:
+        with open(file_path, "r", encoding="utf-8") as file:
+            content = file.read()
+        logging.info("Текст Конституции загружен успешно.")
+        st.session_state.messages.append({"role": "system", "content": content})
+        store_in_chroma("system", content)
+    except FileNotFoundError:
+        logging.error("Файл с Конституцией не найден. Убедитесь, что файл существует.")
+
 def main():
     st.title("Chat with LLMs Models")
     logging.info("Приложение запущено")
+
+    load_constitution()
 
     model = st.sidebar.selectbox("Выберите модель", ["llama3.2:latest", "llama3.1 8b", "phi3", "mistral"])
     logging.info(f"Выбрана модель: {model}")
